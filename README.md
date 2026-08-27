@@ -1,128 +1,123 @@
-Sentinel Voice – English Fatigue Detection Pipeline
-A personalized voice-based fatigue detection system designed to analyze changes in a speaker's voice and identify potential fatigue levels.
-Overview
-Sentinel Voice combines a global fatigue classification model with speaker-specific personalization.
-The system detects three primary states:
-🟢 Alert
-🟡 Mild Fatigue
-🔴 High Fatigue
-Instead of relying only on a global model, Sentinel Voice creates a personalized vocal baseline for each registered speaker. Future recordings are compared against this baseline to detect deviations from the speaker's normal voice characteristics.
+Sentinel Voice
+Personalized English Voice-Based Fatigue Detection
+Sentinel Voice is a personalized voice-fatigue detection system that analyzes a speaker's voice to identify potential fatigue.
+The system combines a global fatigue classification model with speaker-specific voice analysis to provide a more personalized final assessment.
 Features
-🎙️ Speaker Identity Verification
-Registers speakers using voice embeddings.
-Verifies that an uploaded recording belongs to the selected speaker.
-Calculates voice similarity before performing fatigue analysis.
-🧠 Global Fatigue Classification
-The global model predicts:
+Speaker Identity Verification
+Registers speakers using voice embeddings
+Verifies that an uploaded recording belongs to the selected speaker
+Uses cosine similarity for speaker verification
+Global Fatigue Classification
+The system predicts three fatigue states:
 Alert
 Mild Fatigue
 High Fatigue
-Prediction probabilities and confidence scores are also generated.
-📊 Speech Analysis
+Speech Analysis
 The pipeline extracts:
 Words Per Minute (WPM)
 Words Per Second (WPS)
-Speech transcription is used to calculate speech-rate features.
-🔬 Acoustic Feature Extraction
-The system analyzes the following personalized voice features:
+Acoustic Feature Analysis
+The following voice features are analyzed:
 Mean F0
 Energy
 Jitter
 Shimmer
 Harmonics-to-Noise Ratio (HNR)
-👤 Personalized Speaker Baseline
-Each speaker creates a baseline using multiple reliable recordings predicted as Alert.
-The baseline stores statistical information for each feature:
+Personalized Speaker Baseline
+Each speaker has a personalized voice baseline created using multiple reliable Alert recordings.
+For each feature, the baseline stores:
 Mean
 Median
 Standard Deviation
-📈 Personalized Deviation Analysis
-New recordings are compared against the speaker's baseline using Z-score-based deviation analysis.
-Each feature is categorized as:
+Personalized Deviation Analysis
+New recordings are compared with the speaker's baseline using Z-score-based deviation analysis.
+Each feature can be categorized as:
 NORMAL
 SLIGHT_DEVIATION
 SIGNIFICANT_DEVIATION
 EXTREME_DEVIATION
-A combined personalized deviation score is also calculated.
-🔀 Fusion-Based Final Assessment
-The system combines:
-Global Classifier Output
-        +
-Personalized Deviation Score
-        ↓
-Final Fatigue Assessment
-        ↓
-Risk Level
-This allows Sentinel Voice to consider both general fatigue patterns and individual changes in vocal behavior.
+Fusion-Based Assessment
+The final fatigue assessment combines:
+Global fatigue classifier output
+Personalized voice deviation score
+This produces a final fatigue assessment and risk level.
 Pipeline Architecture
 Audio Input
-    ↓
+    │
+    ▼
 Audio Preprocessing
-    ↓
+    │
+    ▼
 Speaker Identity Verification
-    ↓
+    │
+    ▼
 Feature Extraction
+    │
     ├── Speech Features
-    │     ├── WPM
-    │     └── WPS
+    │   ├── WPM
+    │   └── WPS
     │
     └── Acoustic Features
-          ├── Mean F0
-          ├── Energy
-          ├── Jitter
-          ├── Shimmer
-          └── HNR
-    ↓
+        ├── Mean F0
+        ├── Energy
+        ├── Jitter
+        ├── Shimmer
+        └── HNR
+    │
+    ▼
 Global Fatigue Classifier
-    ↓
-Speaker Personalization
+    │
+    ▼
+Personalized Speaker Analysis
+    │
     ├── Candidate Management
     ├── Baseline Creation
     └── Deviation Analysis
-    ↓
+    │
+    ▼
 Fusion
-    ↓
+    │
+    ▼
 Final Fatigue Assessment
-    ↓
+    │
+    ▼
 Risk Level
 Speaker Personalization Workflow
 1. Register Speaker
 A new speaker is assigned a unique speaker_id.
-2. Verify Speaker Identity
-Voice embeddings are compared with the registered speaker identity.
+2. Speaker Verification
+The uploaded recording is converted into a speaker embedding and compared with the registered speaker identity.
 Voice Recording
-      ↓
+       │
+       ▼
 Speaker Embedding
-      ↓
+       │
+       ▼
 Cosine Similarity
-      ↓
-Identity Verified
-3. Create Candidate Recordings
-Reliable Alert recordings are stored as baseline candidates.
-4. Create Permanent Baseline
-After collecting sufficient reliable candidates, the system creates a permanent personalized baseline.
-Example:
-{
-    "wpm": {
-        "mean": 185.84,
-        "median": 183.97,
-        "std": 2.94
-    },
-    "wps": {
-        "mean": 3.09,
-        "median": 3.06,
-        "std": 0.04
-    },
-    "num_recordings": 3
-}
-5. Analyze Future Recordings
-Once a baseline exists, new recordings are compared against the speaker's normal vocal characteristics.
+       │
+       ▼
+Speaker Verified
+3. Candidate Collection
+Reliable recordings predicted as Alert are stored as baseline candidates.
+4. Baseline Creation
+After collecting enough reliable candidates, a permanent speaker baseline is created.
+The baseline contains statistical information for:
+WPM
+WPS
+Mean F0
+Energy
+Jitter
+Shimmer
+HNR
+5. Personalized Analysis
+Future recordings are compared against the speaker's baseline to measure changes in vocal characteristics.
 Project Structure
 sentinel_voice/
 │
 ├── app.py
 │
 ├── src/
+│   │
 │   ├── personalization/
 │   │   ├── baseline.py
 │   │   ├── candidate_manager.py
@@ -139,18 +134,21 @@ sentinel_voice/
 │   ├── baseline_candidates/
 │   └── speaker_identities/
 │
-└── requirements.txt
+├── requirements.txt
+│
+└── README.md
 Running the Application
-Activate your virtual environment:
+1. Activate the Virtual Environment
 source jagu/bin/activate
-Run the Streamlit application:
+2. Run the Streamlit Application
 streamlit run app.py
 The application will open in your browser.
-Current Status
-The English pipeline currently supports:
+Current Capabilities
 Speaker registration
 Speaker identity verification
-Alert, Mild Fatigue, and High Fatigue classification
+Alert detection
+Mild fatigue detection
+High fatigue detection
 Speech-rate analysis
 Acoustic feature extraction
 Personalized baseline creation
@@ -159,15 +157,6 @@ Feature-level deviation analysis
 Personalized deviation scoring
 Fusion-based fatigue assessment
 Risk-level generation
-The pipeline has also been tested with multiple speakers and previously unseen voice recordings.
-Future Work
-Planned improvements include:
-Hindi language support
-Multilingual voice processing
-Additional speaker testing
-Larger validation datasets
-Adaptive baseline updates using reliable future recordings
-Further model evaluation and optimization
 Tech Stack
 Python
 PyTorch
@@ -176,4 +165,11 @@ Whisper
 WavLM
 ECAPA-TDNN
 NumPy
-Audio processing and acoustic feature extraction libraries
+Audio processing libraries
+Future Work
+Hindi language support
+Multilingual voice processing
+Larger validation datasets
+Adaptive speaker baseline updates
+Continuous learning mechanisms
+Further model optimization
