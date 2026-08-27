@@ -1,0 +1,34 @@
+# Virtual environments
+jagu/
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Model checkpoints / large files
+*.pt
+*.pth
+*.ckpt
+
+# Temporary files
+*.tmp
