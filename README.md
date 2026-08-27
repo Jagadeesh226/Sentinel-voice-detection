@@ -1,175 +1,274 @@
-Sentinel Voice
-Personalized English Voice-Based Fatigue Detection
-Sentinel Voice is a personalized voice-fatigue detection system that analyzes a speaker's voice to identify potential fatigue.
-The system combines a global fatigue classification model with speaker-specific voice analysis to provide a more personalized final assessment.
-Features
-Speaker Identity Verification
-Registers speakers using voice embeddings
-Verifies that an uploaded recording belongs to the selected speaker
-Uses cosine similarity for speaker verification
-Global Fatigue Classification
-The system predicts three fatigue states:
-Alert
-Mild Fatigue
-High Fatigue
-Speech Analysis
-The pipeline extracts:
-Words Per Minute (WPM)
-Words Per Second (WPS)
-Acoustic Feature Analysis
-The following voice features are analyzed:
-Mean F0
-Energy
-Jitter
-Shimmer
-Harmonics-to-Noise Ratio (HNR)
-Personalized Speaker Baseline
-Each speaker has a personalized voice baseline created using multiple reliable Alert recordings.
-For each feature, the baseline stores:
-Mean
-Median
-Standard Deviation
-Personalized Deviation Analysis
-New recordings are compared with the speaker's baseline using Z-score-based deviation analysis.
-Each feature can be categorized as:
-NORMAL
-SLIGHT_DEVIATION
-SIGNIFICANT_DEVIATION
-EXTREME_DEVIATION
-Fusion-Based Assessment
-The final fatigue assessment combines:
-Global fatigue classifier output
-Personalized voice deviation score
-This produces a final fatigue assessment and risk level.
-Pipeline Architecture
+# Sentinel Voice Detection
+
+An AI-based voice analysis system designed to detect potential **fatigue levels from speech**. The system analyzes acoustic, temporal, speech-rate, and deep speech representations, while also supporting **speaker verification and personalized baseline comparison**.
+
+The project is part of the Sentinel fatigue detection pipeline, where voice acts as one of the modalities for assessing a person's fatigue state.
+
+## Features
+
+* Voice-based fatigue classification
+* Multi-class fatigue detection:
+
+  * Alert
+  * Mild Fatigue
+  * High Fatigue
+* Acoustic feature extraction
+* Speech-rate analysis
+* Temporal speech analysis
+* WavLM-based deep speech embeddings
+* Feature fusion and Transformer-based sequence modeling
+* Attention-based pooling
+* Speaker verification using ECAPA-TDNN
+* Personalized fatigue detection using speaker-specific baselines
+* Candidate baseline management
+* Voice enrollment workflow
+* Real and synthetic speech datasets
+* Streamlit application for inference
+
+## System Architecture
+
+The pipeline follows the flow below:
+
+```text
 Audio Input
     │
     ▼
-Audio Preprocessing
+Preprocessing
+    ├── Audio Loading
+    ├── Voice Activity Detection
+    └── Normalization
     │
     ▼
-Speaker Identity Verification
+Speech Analysis
+    ├── Acoustic Features
+    ├── Speech Rate
+    ├── Temporal Features
+    └── WavLM Embeddings
     │
     ▼
-Feature Extraction
-    │
-    ├── Speech Features
-    │   ├── WPM
-    │   └── WPS
-    │
-    └── Acoustic Features
-        ├── Mean F0
-        ├── Energy
-        ├── Jitter
-        ├── Shimmer
-        └── HNR
+Feature Processing
+    ├── Normalization
+    ├── Projection
+    └── Sequence Construction
     │
     ▼
-Global Fatigue Classifier
+Feature Fusion
     │
     ▼
-Personalized Speaker Analysis
-    │
-    ├── Candidate Management
-    ├── Baseline Creation
-    └── Deviation Analysis
+Transformer Encoder
     │
     ▼
-Fusion
+Attention Pooling
     │
     ▼
-Final Fatigue Assessment
+Fatigue Classifier
     │
     ▼
-Risk Level
-Speaker Personalization Workflow
-1. Register Speaker
-A new speaker is assigned a unique speaker_id.
-2. Speaker Verification
-The uploaded recording is converted into a speaker embedding and compared with the registered speaker identity.
-Voice Recording
-       │
-       ▼
-Speaker Embedding
-       │
-       ▼
-Cosine Similarity
-       │
-       ▼
-Speaker Verified
-3. Candidate Collection
-Reliable recordings predicted as Alert are stored as baseline candidates.
-4. Baseline Creation
-After collecting enough reliable candidates, a permanent speaker baseline is created.
-The baseline contains statistical information for:
-WPM
-WPS
-Mean F0
-Energy
-Jitter
-Shimmer
-HNR
-5. Personalized Analysis
-Future recordings are compared against the speaker's baseline to measure changes in vocal characteristics.
-Project Structure
+Alert / Mild Fatigue / High Fatigue
+```
+
+## Personalization Pipeline
+
+In addition to general fatigue classification, the system supports speaker-specific analysis.
+
+```text
+Speaker Enrollment
+        │
+        ▼
+Speaker Verification
+        │
+        ▼
+Baseline Candidate Collection
+        │
+        ▼
+Baseline Selection
+        │
+        ▼
+Personalized Feature Extraction
+        │
+        ▼
+Deviation from Personal Baseline
+        │
+        ▼
+Personalized Fatigue Inference
+```
+
+The personalized approach allows the system to compare a person's current voice characteristics against their own baseline rather than relying only on population-level patterns.
+
+## Project Structure
+
+```text
 sentinel_voice/
 │
 ├── app.py
-│
-├── src/
-│   │
-│   ├── personalization/
-│   │   ├── baseline.py
-│   │   ├── candidate_manager.py
-│   │   ├── deviation.py
-│   │   ├── feature_extractor.py
-│   │   ├── fusion.py
-│   │   ├── speaker_identity.py
-│   │   └── workflow.py
-│   │
-│   └── ...
+├── requirements.txt
+├── README.md
 │
 ├── data/
-│   ├── baselines/
 │   ├── baseline_candidates/
-│   └── speaker_identities/
+│   ├── baselines/
+│   ├── dataset/
+│   │   ├── real/
+│   │   │   ├── paired/
+│   │   │   └── unpaired/
+│   │   └── synthetic/
+│   ├── enrollment/
+│   └── raw/
 │
-├── requirements.txt
+├── pretrained_models/
+│   └── spkrec-ecapa-voxceleb/
 │
-└── README.md
-Running the Application
-1. Activate the Virtual Environment
-source jagu/bin/activate
-2. Run the Streamlit Application
+├── src/
+│   ├── features/
+│   ├── models/
+│   ├── personalization/
+│   ├── preprocessing/
+│   ├── segmentation/
+│   ├── speaker/
+│   ├── utils/
+│   ├── dataset.py
+│   ├── inference.py
+│   └── train.py
+│
+└── test/
+    ├── evaluation scripts
+    ├── feature tests
+    ├── model tests
+    ├── personalization tests
+    └── pipeline tests
+```
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Jagadeesh226/Sentinel-voice-detection.git
+cd Sentinel-voice-detection
+```
+
+Create and activate a virtual environment:
+
+```bash
+python -m venv venv
+```
+
+### macOS / Linux
+
+```bash
+source venv/bin/activate
+```
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Running the Application
+
+Start the Streamlit application:
+
+```bash
 streamlit run app.py
-The application will open in your browser.
-Current Capabilities
-Speaker registration
-Speaker identity verification
-Alert detection
-Mild fatigue detection
-High fatigue detection
-Speech-rate analysis
-Acoustic feature extraction
-Personalized baseline creation
-Candidate validation
-Feature-level deviation analysis
-Personalized deviation scoring
-Fusion-based fatigue assessment
-Risk-level generation
-Tech Stack
-Python
-PyTorch
-Streamlit
-Whisper
-WavLM
-ECAPA-TDNN
-NumPy
-Audio processing libraries
-Future Work
-Hindi language support
-Multilingual voice processing
-Larger validation datasets
-Adaptive speaker baseline updates
-Continuous learning mechanisms
-Further model optimization
+```
+
+## Dataset
+
+The project includes both real and synthetic voice samples organized across three fatigue categories:
+
+* **Alert**
+* **Mild Fatigue**
+* **High Fatigue**
+
+The real dataset is further organized into:
+
+* Paired samples
+* Unpaired samples
+
+The project also contains metadata and dataset split files used for training and evaluation.
+
+## Speaker Personalization
+
+The system supports personalized fatigue analysis through speaker-specific baselines.
+
+The workflow includes:
+
+1. Speaker enrollment
+2. Speaker identity verification
+3. Collection of baseline candidates
+4. Selection and storage of stable baseline representations
+5. Extraction of features from incoming speech
+6. Comparison against the speaker's baseline
+7. Personalized fatigue inference
+
+This helps account for natural differences between speakers, such as speaking rate, pitch, energy, and other voice characteristics.
+
+## Testing
+
+The `test/` directory contains scripts for validating individual components and the complete pipeline.
+
+Examples include:
+
+```bash
+python test/test_audio.py
+python test/test_acoustic.py
+python test/test_wavlm.py
+python test/test_speaker.py
+python test/test_baseline.py
+python test/test_end_to_end.py
+```
+
+Model evaluation can be performed using:
+
+```bash
+python test/evaluate_model.py
+```
+
+## Technologies Used
+
+* Python
+* PyTorch
+* WavLM
+* Transformer Encoder
+* Attention Mechanisms
+* ECAPA-TDNN
+* SpeechBrain
+* Streamlit
+* Librosa / Audio Processing Tools
+* NumPy
+* Pandas
+
+## Fatigue Detection Classes
+
+| Class        | Description                                          |
+| ------------ | ---------------------------------------------------- |
+| Alert        | Speech characteristics closer to the alert state     |
+| Mild Fatigue | Moderate deviation from alert speech characteristics |
+| High Fatigue | Significant deviation associated with higher fatigue |
+
+## Disclaimer
+
+This project is a research and development prototype for voice-based fatigue analysis. It is not intended to be used as a standalone medical or clinical diagnostic system.
+
+## Future Improvements
+
+* Larger and more diverse real-world datasets
+* Improved speaker-independent generalization
+* Continuous baseline adaptation
+* Multilingual voice analysis
+* Real-time streaming inference
+* Integration with additional fatigue modalities
+* Multimodal fatigue detection using voice, facial behavior, eye movement, and reaction time
+
+---
+
+## License
+
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
